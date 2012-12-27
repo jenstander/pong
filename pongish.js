@@ -27,7 +27,7 @@
         y_movement : 5,
         radius : 10
     },
-    speed = 100,
+    speed = 20,
     points = 0;
 
    
@@ -42,6 +42,8 @@
     };
    
    function init(){
+       // clear in case there's someting on it
+       ctx.clearRect(0,0,board_width,board_height);
        //paddles
         paddles = default_paddles;
         paddles.right_paddle_x = board_width - paddles.width - 10;
@@ -82,7 +84,7 @@
         ctx.stroke();
    }
    function movePuck() {
-
+        game_started = true;
        var loopMovement = setInterval(function(){
            removePuck(puck.x,puck.y);
            if((puck.y + puck.radius + puck.y_movement > board_height) || (puck.y - puck.radius + puck.y_movement < 0)){
@@ -96,10 +98,7 @@
                
            }
            if((puck.x - puck.radius + puck.x_movement < 0) || (puck.x + puck.radius + puck.x_movement > board_width)){
-               ctx.clearRect(0,0,board_width,board_height);
-               ctx.fillStyle = "blue";
-               ctx.font = "bold 1em sans-serif";
-               ctx.fillText("Good Game!  Your total score is " + points + ". Press r to restart game.", 20, 20);
+               lose();
                clearInterval(loopMovement);
            }else{ 
                drawPuck(puck.x += puck.x_movement, puck.y += puck.y_movement);
@@ -108,7 +107,11 @@
        }, speed);
    }
    function lose() {
-       
+       ctx.clearRect(0,0,board_width,board_height);
+       ctx.fillStyle = "blue";
+       ctx.font = "bold 1em sans-serif";
+       ctx.fillText("Good Game!  Your total score is " + points + ". Press r to restart game.", 20, 20);
+       game_started = false;
    }
    function onKeyDown(evt) {
        //up down for right ana
@@ -134,8 +137,13 @@
            paddles.left_paddle_y += 5
           drawPaddle(paddles.left_paddle_x, paddles.left_paddle_y, paddles.width, paddles.height);
        }
+       // start game
        if(evt.keyCode == 83 && game_started === false){
            movePuck();
+       }
+       // restart game
+       if(evt.keyCode == 82 && game_started === false){
+           init();
        }
     }
 
